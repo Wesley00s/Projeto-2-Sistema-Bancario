@@ -18,11 +18,10 @@ void limparBuffer()
 
 int main()
 {
-    int sair = 0;
     int totalTitulares = 0;
     int opcao = 0;
     int opcaoConta = 0;
-    int rendimentos[totalTitulares];
+    int rendimentos[TAM] = {0};
     float valor = 0;
     int acao = 0;
     char pesquisa[15];
@@ -44,6 +43,12 @@ int main()
         rendimentos[totalTitulares] = 0;
         int encontrada = 0;
         int index = 0;
+        float valTransf = 0;
+        float aplyRendimentos = 0;
+        int contDebit = 0;
+        int contCredit = 0;
+        float qntEmprestimo = 0;
+        int opcaoEmprestimo = 0;
 
         printf(AMARELO "\n=========================== MENU DE OPÇÕES ===========================\n\n" RESET);
         printf(AZUL "--------------------------  ---------------------  --------------------\n" RESET);
@@ -219,7 +224,6 @@ int main()
 
         case 3:
             limparBuffer();
-            char numContaPesquisa[10];
             printf(AMARELO "\n=========================== REALIZAR TRANSAÇÃO ===========================\n\n" RESET);
             printf("Número da conta: ");
             scanf("%15[^\n]", pesquisa);
@@ -416,10 +420,6 @@ int main()
 
         case 6:
 
-            float valTransf = 0;
-            float saldo1 = 0;
-            float saldo2 = 0;
-
             printf(AMARELO "\n=========================== FAZER TRANSFERÊNCIA ===========================\n\n" RESET);
 
             limparBuffer();
@@ -427,23 +427,20 @@ int main()
             scanf("%15[^\n]", pesquisa);
             printf("\n");
 
-            int i = 0;
-            int j = 0;
-
-            for (i = 0; i < totalTitulares; i++)
+            for (contDebit = 0; contDebit < totalTitulares; contDebit++)
             {
-                if (strcmp(numConta[i], pesquisa) == 0)
+                if (strcmp(numConta[contDebit], pesquisa) == 0)
                 {
                     encontrada = 1;
                     printf(VERDE "CONTA ENCONTRADA\n" RESET);
 
                     printf(AZUL "\n\t* DADOS\n" RESET);
                     printf(AZUL "\t-----------------------------------------------------\n" RESET);
-                    printf(AMARELO "\t| TITULAR%s       %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, nome[i], RESET);
+                    printf(AMARELO "\t| TITULAR%s       %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, nome[contDebit], RESET);
                     printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                    printf(AMARELO "\t| CONTA%s         %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[i], RESET);
+                    printf(AMARELO "\t| CONTA%s         %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[contDebit], RESET);
                     printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                    printf(AMARELO "\t| SALDO%s         %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[i], RESET);
+                    printf(AMARELO "\t| SALDO%s         %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[contDebit], RESET);
                     printf(AZUL "\t-----------------------------------------------------\n\n" RESET);
 
                     printf("Digite o valor a ser transferido: R$ ");
@@ -454,49 +451,51 @@ int main()
                     scanf("%15[^\n]", pesquisa);
                     printf("\n");
 
-                    for (j = 0; j < totalTitulares; j++)
+                    for (contCredit = 0; contCredit < totalTitulares; contCredit++)
                     {
-                        if (strcmp(numConta[j], pesquisa) == 0)
+                        if (strcmp(numConta[contCredit], pesquisa) == 0)
                         {
                             encontrada = 1;
                             printf(VERDE "CONTA ENCONTRADA\n" RESET);
 
                             printf(AZUL "\n\t* DADOS\n" RESET);
                             printf(AZUL "\t-----------------------------------------------------\n" RESET);
-                            printf(AMARELO "\t| TITULAR%s       %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, nome[j], RESET);
+                            printf(AMARELO "\t| TITULAR%s       %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, nome[contCredit], RESET);
                             printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                            printf(AMARELO "\t| CONTA%s         %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[j], RESET);
+                            printf(AMARELO "\t| CONTA%s         %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[contCredit], RESET);
                             printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                            printf(AMARELO "\t| SALDO%s         %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[j], RESET);
+                            printf(AMARELO "\t| SALDO%s         %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[contCredit], RESET);
                             printf(AZUL "\t-----------------------------------------------------\n\n" RESET);
-                            if (valTransf <= saldo[i])
+                            if (valTransf <= saldo[contDebit])
                             {
-                                saldo[i] -= valTransf;
-                                saldo[j] += valTransf; 
+                                saldo[contDebit] -= valTransf;
+                                saldo[contCredit] += valTransf;
 
                                 printf("\nTranferência de R$ %.2f realizada com sucesso!\n\n", valTransf);
                                 printf(AZUL "\n\t* DADOS CONTA CRÉDITADA\n" RESET);
                                 printf(AZUL "\t-----------------------------------------------------\n" RESET);
-                                printf(AMARELO "\t| TITULAR%s           %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, nome[j], RESET);
+                                printf(AMARELO "\t| TITULAR%s           %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, nome[contCredit], RESET);
                                 printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                                printf(AMARELO "\t| CONTA%s             %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[j], RESET);
+                                printf(AMARELO "\t| CONTA%s             %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[contCredit], RESET);
                                 printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                                printf(AMARELO "\t| SALDO ATUALIZADO%s  %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[j], RESET);
+                                printf(AMARELO "\t| SALDO ATUALIZADO%s  %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[contCredit], RESET);
                                 printf(AZUL "\t-----------------------------------------------------\n\n" RESET);
 
                                 printf(AZUL "\n\t* DADOS CONTA DEBITADA\n" RESET);
                                 printf(AZUL "\t-----------------------------------------------------\n" RESET);
-                                printf(AMARELO "\t| TITULAR%s           %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, nome[i], RESET);
+                                printf(AMARELO "\t| TITULAR%s           %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, nome[contDebit], RESET);
                                 printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                                printf(AMARELO "\t| CONTA%s             %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[i], RESET);
+                                printf(AMARELO "\t| CONTA%s             %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[contDebit], RESET);
                                 printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                                printf(AMARELO "\t| SALDO ATUALIZADO%s  %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[i], RESET);
+                                printf(AMARELO "\t| SALDO ATUALIZADO%s  %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[contDebit], RESET);
                                 printf(AZUL "\t-----------------------------------------------------\n\n" RESET);
+
                             }
                             else
                             {
                                 printf(VERMELHO "\nSALDO INSUFICIENTE!\n\n" RESET);
                             }
+                            valTransf = 0;
 
                             break;
                         }
@@ -515,8 +514,6 @@ int main()
         break;
 
         case 7:
-
-            float aplyRendimentos = 0;
 
             printf(AMARELO "\n=========================== RENDIMENTOS ===========================\n\n" RESET);
 
@@ -565,6 +562,7 @@ int main()
                     }else{
                         printf(VERMELHO "\nNEGADO! TAXA LIMITE DE 10%% ATINGIDA\n" RESET);
                     }
+                    aplyRendimentos = 0;
 
                     break;
                 }
@@ -577,9 +575,6 @@ int main()
         break;
 
         case 8:
-
-            float qntEmprestimo = 0;
-            int opcaoEmprestimo = 0;
 
             printf(AMARELO "\n=========================== EMPRÉSTIMOS ===========================\n\n" RESET);
 
@@ -635,79 +630,96 @@ int main()
                     printf(AZUL "-------------  -------------\n" RESET);
                     scanf("%d", &opcaoEmprestimo);
 
-                    if(opcaoEmprestimo == 1 && saldo[i] >= 1000 && situacaoEmprestimo[i] == 0){
+                    switch (opcaoEmprestimo)
+                    {
+                    case 1:
+                    
 
-                        printf(AZUL "\nPEDIR EMPRÉSTIMO\n\n" RESET);
-                        printf(VERMELHO "ATENÇÃO: A TAXA DE JUROS É DE 15%% E EMPRÉSTIMO MÍNIMO DE R$ 5000.00!\n" RESET);
-                        printf("Digite a quantia que deseja pedir emprestado: R$ ");
-                        scanf("%f", &qntEmprestimo);
-                        printf("\n");
+                        if(saldo[i] >= 1000 && situacaoEmprestimo[i] == 0){
 
-                        saldo[i] += qntEmprestimo;
-                        situacaoEmprestimo[i] += qntEmprestimo + (qntEmprestimo * 0.15); 
+                            printf(AZUL "\nPEDIR EMPRÉSTIMO\n\n" RESET);
+                            printf(VERMELHO "ATENÇÃO: A TAXA DE JUROS É DE 15%% E EMPRÉSTIMO MÍNIMO DE R$ 5000.00!\n" RESET);
+                            printf("Digite a quantia que deseja pedir emprestado: R$ ");
+                            scanf("%f", &qntEmprestimo);
+                            printf("\n");
 
-                        if(qntEmprestimo >= 5000){
+                            if(qntEmprestimo >= 5000){
 
-                            printf(VERDE "\nEMPRÉSTIMO DE%s %sR$ %.2f BEM SUCEDIDO%s\n\n", RESET, AZUL, qntEmprestimo, RESET);
-                            printf(AZUL "\t-----------------------------------------------------\n" RESET);
-                            printf(AMARELO "\t| TITULAR%s             %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, nome[i], RESET);
-                            printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                            printf(AMARELO "\t| TIPO DE CONTA%s       %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, tipoConta[i], RESET);
-                            printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                            printf(AMARELO "\t| CONTA%s               %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[i], RESET);
-                            printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                            printf(AMARELO "\t| SALDO ATUALIZADO%s    %s|%s %s%.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[i], RESET);
-                            printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                            printf(AMARELO "\t| SITUAÇÃO EMPRÉSTIMO%s %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERMELHO, situacaoEmprestimo[i], RESET);
-                            printf(AZUL "\t-----------------------------------------------------\n\n" RESET);
-                        
-                        }else{
-                            printf(VERMELHO "RECUSADO! VALOR MINIMO DO EMPRÉSTIMO É R$ 5000.00\n" RESET);
+                                saldo[i] += qntEmprestimo;
+                                situacaoEmprestimo[i] += qntEmprestimo + (qntEmprestimo * 0.15); 
+
+                                printf(VERDE "\nEMPRÉSTIMO DE R$ %.2f BEM SUCEDIDO%s\n\n", qntEmprestimo, RESET);
+                                printf(AZUL "\t-----------------------------------------------------\n" RESET);
+                                printf(AMARELO "\t| TITULAR%s             %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, nome[i], RESET);
+                                printf(AZUL "\t|---------------------------------------------------|\n" RESET);
+                                printf(AMARELO "\t| TIPO DE CONTA%s       %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, tipoConta[i], RESET);
+                                printf(AZUL "\t|---------------------------------------------------|\n" RESET);
+                                printf(AMARELO "\t| CONTA%s               %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[i], RESET);
+                                printf(AZUL "\t|---------------------------------------------------|\n" RESET);
+                                printf(AMARELO "\t| SALDO ATUALIZADO%s    %s|%s %s%.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[i], RESET);
+                                printf(AZUL "\t|---------------------------------------------------|\n" RESET);
+                                printf(AMARELO "\t| SITUAÇÃO EMPRÉSTIMO%s %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERMELHO, situacaoEmprestimo[i], RESET);
+                                printf(AZUL "\t-----------------------------------------------------\n\n" RESET);
+                                break;
+                            
+                            }else{
+                                printf(VERMELHO "RECUSADO! VALOR MINIMO DO EMPRÉSTIMO É R$ 5000.00\n" RESET);
+                                break;
+                            }
+                        }else {
+
+                            printf(VERMELHO "\nPEDIDO DE EMPRÉSTIMO NEGADO! VERIFIQUE SE NÃO TEM NENHUMA PENDÊNCIA COM O BANCO OU SE SEU SALDO È SUFICIENTE (MINÍMO R$ 1000)\n" RESET);
                             break;
                         }
-                    }else if(situacaoEmprestimo[i] > 0 && opcaoEmprestimo != 2){
 
-                        printf(VERMELHO "\nPEDIDO DE EMPRÉSTIMO NEGADO! VERIFIQUE SE NÃO TEM NENHUMA PENDÊNCIA COM O BANCO OU SE SEU SALDO È SUFICIENTE (MINÍMO R$ 1000)\n" RESET);
-                        break;
-                    }
 
-                    if(opcaoEmprestimo == 2 && situacaoEmprestimo[i] > 0){
-                        
-                        printf(AZUL "\nPAGAR EMPRÉSTIMO\n\n" RESET);
+                    break; //fim do case 1
 
-                        printf(VERMELHO "\nATENÇÃO: A TAXA DE JUROS DE 15%% APLICADA. TOTAL A PAGAR:%s %sR$ %.2f%s\n", RESET, AZUL, situacaoEmprestimo[i], RESET);
-                        printf("Pagar: R$ ");
-                        scanf("%f", &qntEmprestimo);
+                    case 2:
 
-                        if(qntEmprestimo == situacaoEmprestimo[i]){
+                        if(situacaoEmprestimo[i] > 0){
+                            
+                            printf(AZUL "\nPAGAR EMPRÉSTIMO\n\n" RESET);
 
-                            situacaoEmprestimo[i] -= qntEmprestimo;
-                            saldo[i] -= qntEmprestimo;
+                            printf(VERMELHO "\nATENÇÃO: A TAXA DE JUROS DE 15%% APLICADA. TOTAL A PAGAR:%s %sR$ %.2f%s\n", RESET, AZUL, situacaoEmprestimo[i], RESET);
+                            printf("Pagar: R$ ");
+                            scanf("%f", &qntEmprestimo);
 
-                            printf(VERDE "\nPAGAMENTO DE EMPRÉSTIMO DE%s %sR$ %.2f BEM SUCEDIDO%s\n", RESET, AZUL, qntEmprestimo, RESET);
-                            printf(AZUL "\t-----------------------------------------------------\n" RESET);
-                            printf(AMARELO "\t| TITULAR%s             %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, nome[i], RESET);
-                            printf(AZUL "\t|---------------------------------------------------\n" RESET);
-                            printf(AMARELO "\t| TIPO DE CONTA%s       %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, tipoConta[i], RESET);
-                            printf(AZUL "\t|---------------------------------------------------\n" RESET);
-                            printf(AMARELO "\t| CONTA%s               %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[i], RESET);
-                            printf(AZUL "\t|---------------------------------------------------\n" RESET);
-                            printf(AMARELO "\t| SALDO ATUALIZADO%s    %s|%s %s%.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[i], RESET);
-                            printf(AZUL "\t|---------------------------------------------------\n" RESET);
-                            printf(AMARELO "\t| SITUAÇÃO EMPRÉSTIMO%s %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERMELHO, situacaoEmprestimo[i], RESET);
-                            printf(AZUL "\t-----------------------------------------------------\n\n" RESET);
+                            if(qntEmprestimo == situacaoEmprestimo[i]){
 
-                        }else{
+                                situacaoEmprestimo[i] -= qntEmprestimo;
+                                saldo[i] -= qntEmprestimo;
 
-                            printf(VERMELHO "\nPAGAMENTO RECUSADO, VOCÊ SÓ PODE PAGAR O VALOR TOTAL!\n" RESET);
+                                printf(VERDE "\nPAGAMENTO DE EMPRÉSTIMO DE%s %sR$ %.2f BEM SUCEDIDO%s\n", RESET, AZUL, qntEmprestimo, RESET);
+                                printf(AZUL "\t-----------------------------------------------------\n" RESET);
+                                printf(AMARELO "\t| TITULAR%s             %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, nome[i], RESET);
+                                printf(AZUL "\t|---------------------------------------------------\n" RESET);
+                                printf(AMARELO "\t| TIPO DE CONTA%s       %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, tipoConta[i], RESET);
+                                printf(AZUL "\t|---------------------------------------------------\n" RESET);
+                                printf(AMARELO "\t| CONTA%s               %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[i], RESET);
+                                printf(AZUL "\t|---------------------------------------------------\n" RESET);
+                                printf(AMARELO "\t| SALDO ATUALIZADO%s    %s|%s %s%.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[i], RESET);
+                                printf(AZUL "\t|---------------------------------------------------\n" RESET);
+                                printf(AMARELO "\t| SITUAÇÃO EMPRÉSTIMO%s %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERMELHO, situacaoEmprestimo[i], RESET);
+                                printf(AZUL "\t-----------------------------------------------------\n\n" RESET);
+
+                            }else{
+
+                                printf(VERMELHO "\nPAGAMENTO RECUSADO, VOCÊ SÓ PODE PAGAR O VALOR TOTAL!\n" RESET);
+                            }
+
+                            opcaoEmprestimo = 0;
+                            qntEmprestimo = 0;
+                            break;
+
+                        }else {
+                            printf(AZUL "\nVOCÊ NÃO TEM PEDÊNCIAS COM O BANCO\n" RESET);
                         }
 
-                        qntEmprestimo = 0;
-                        break;
+                    break;//fim do case 1
 
-                    }else if(situacaoEmprestimo[i] == 0){
-                        printf(AZUL "\nVOCÊ NÃO TEM PEDÊNCIAS COM O BANCO\n" RESET);
-                    }
+                    } //fim do switch
+
 
                     break;
                 }
@@ -725,6 +737,7 @@ int main()
 
         default:
             printf(VERMELHO "\n[ERROR] OPÇÃO INVÁLIDA!\n\n" RESET);
+        break;
         }
 
     } while (totalTitulares < TAM && acao != 9);
