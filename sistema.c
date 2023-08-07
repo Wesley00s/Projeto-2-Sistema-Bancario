@@ -716,7 +716,7 @@ int main()
                             printf(AZUL "\nVOCÊ NÃO TEM PEDÊNCIAS COM O BANCO\n" RESET);
                         }
 
-                    break;//fim do case 1
+                    break;//fim do case 2
 
                     } //fim do switch
 
