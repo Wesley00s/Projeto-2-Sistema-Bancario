@@ -29,10 +29,10 @@ int main()  //FUNÇÃO PRINCIPAL
     char pesquisa[15]; //ARMAZENA O NÚMERO DA CONTA QUE DESEJA PESQUISAR
 
     //ONDE OS DADOS DOS TITULARES SÃO ARMAZENADOS
-    char nome[TAM][TAM];
+    char nome[TAM][55];
     char CPF[TAM][25];
-    char endereco[TAM][TAM];
-    char tel[TAM][TAM];
+    char endereco[TAM][55];
+    char tel[TAM][16];
 
     //ONDE OS DADOS BANCÁRIOS DOS TITULARES SÃO ARMAZENADOS
     char tipoConta[TAM][10];
@@ -134,7 +134,7 @@ int main()  //FUNÇÃO PRINCIPAL
                 saldo[totalTitulares] = 0; //INICIALIZA O SALDO DA NOVA CONTA COM 0
                 break;
 
-            case 2:
+            case 2: //OPÇÃO DE CONTA POUPANÇA
                 rendimentos[totalTitulares] = 1;
                 strcpy(tipoConta[totalTitulares], "Poupança");
                 printf("\nDigite o nome: ");
@@ -382,7 +382,7 @@ int main()  //FUNÇÃO PRINCIPAL
                         saldo[j] = saldo[j + 1];
                     }
                     totalTitulares--;
-                    
+
                     // Limpar os dados do titular removido
                     strcpy(nome[totalTitulares], "");
                     strcpy(CPF[totalTitulares], "");
@@ -776,7 +776,7 @@ int main()  //FUNÇÃO PRINCIPAL
             break;
         }
 
-    } while (totalTitulares < TAM && acao != 9);
+    } while (totalTitulares <= TAM && acao != 9);
 
     return 0;
 }
