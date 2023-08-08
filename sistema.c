@@ -657,7 +657,7 @@ int main()  //FUNÇÃO PRINCIPAL
                         printf(AZUL "\t|---------------------------------------------------|\n" RESET);
                         printf(AMARELO "\t| CONTA%s               %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, numConta[i], RESET);
                         printf(AZUL "\t|---------------------------------------------------|\n" RESET);
-                        printf(AMARELO "\t| SALDO%s               %s|%s %s%.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[i], RESET);
+                        printf(AMARELO "\t| SALDO%s               %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, saldo[i], RESET);
                         printf(AZUL "\t|---------------------------------------------------|\n" RESET);
                         printf(AMARELO "\t| SITUAÇÃO EMPRÉSTIMO%s %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERMELHO, situacaoEmprestimo[i], RESET);
                         printf(AZUL "\t-----------------------------------------------------\n\n" RESET);
