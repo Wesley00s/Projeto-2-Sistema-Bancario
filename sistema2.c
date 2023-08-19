@@ -18,11 +18,13 @@ void limparBuffer()
     while ((c = getchar()) != '\n' && c != EOF); // LOOP PARA ENCONTRAR UMA QUEBRA DE LINHA
 }
 
+// EXIBE AS LINHAS DOS MENUS
 void linha()
 {
     printf(AZUL "\t|-----------------------------------------------------|\n" RESET);
 }
 
+// ARMAZENA OS DADOS BANCÁRIOS
 struct Contas
 {
     char tipoConta[10];
@@ -33,6 +35,7 @@ struct Contas
     float situacaoEmprestimo;
 };
 
+// ARMAZENA OS DADOS DOS TITULARES E SEUS RESPECTIVOS DADOS BANCÁRIOS
 struct Titulares
 {
     char nome[55];
@@ -59,7 +62,7 @@ int main() // FUNÇÃO PRINCIPAL
 
     do
     {
-        rendimentos[totalTitulares] = 0; // INICIALIZA A OPÇÃO DE RENDIMENTOS PARA NOVA CONTA CRIADA
+        rendimentos[totalTitulares] = 0; // USADA PRA VERIFICAR SE A CONTA ENCONTRDAD É POUPANÇA
         char conferirConta[TAM][6];      // ARMAZENA O NÚMERO DA CONTA ADICIONADA PARA VERIFICAÇÃO SE JÁ NÃO EXISTE
         float valTransf = 0;             // ARMAZENA O VALOR DA TRANSFERÊNCIA
         float aplyRendimentos = 0;       // ARMAZENA O PERCENTUAL DE RENDIMENTOS A SEREM APLICADOS
@@ -130,6 +133,7 @@ int main() // FUNÇÃO PRINCIPAL
                     }
                 }
 
+                // SE A CONTA JÁ EXISTE RETORNA UM ERRO
                 if (contaExistente)
                 {
                     printf(VERMELHO "\n[ERROR] NÚMERO DE CONTA JÁ EXISTENTE!\n" RESET);
@@ -146,7 +150,7 @@ int main() // FUNÇÃO PRINCIPAL
                     printf(VERDE "\nCONTA CRIADA COM SUCESSO!\n" RESET);
                 }
 
-                totalTitulares++;
+                totalTitulares++; // ATUALIZA O NÚMERO DE TITULARES
                 titulares[totalTitulares].contas[totalTitulares].saldo = 0; // INICIALIZA O SALDO DA NOVA CONTA COM 0
                 break;
 
@@ -183,6 +187,7 @@ int main() // FUNÇÃO PRINCIPAL
                     }
                 }
 
+                // SE A CONTA JÁ EXISTE RETORNA UM ERRO
                 if (contaExistente)
                 {
                     printf(VERMELHO "\n[ERROR] NÚMERO DE CONTA JÁ EXISTENTE!\n" RESET);
@@ -199,7 +204,7 @@ int main() // FUNÇÃO PRINCIPAL
                     printf(VERDE "\nCONTA CRIADA COM SUCESSO!\n" RESET);
                 }
 
-                totalTitulares++;
+                totalTitulares++; // ATUALIZA O NÚMERO DE TITULARES
                 titulares[totalTitulares].contas[totalTitulares].saldo = 0; // INICIALIZA O SALDO DA NOVA CONTA COM 0
                 break;
 
@@ -220,10 +225,10 @@ int main() // FUNÇÃO PRINCIPAL
             {
                 if (strcmp(titulares[i].contas[i].numConta, pesquisa) == 0)
                 {
-                    encontrada = 1;
+                    encontrada = 1; // USADO PARA VERIFICAR SE A CONTA FOI ENCONTRADA
                     printf(VERDE "CONTA ENCONTRADA\n\n" RESET);
 
-                    if (rendimentos[i] == 1)
+                    if (rendimentos[i] == 1) // SE RENDIMETOS FOR IGUAL A 1, ENCONTROU UMA CONTA CORRENTE
                     {
                         printf(AZUL "\n\t* DADOS\n" RESET);
                         linha();
@@ -259,7 +264,7 @@ int main() // FUNÇÃO PRINCIPAL
                         linha();
                         printf(AMARELO "\t| TELEFONE%s            %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[i].tel, RESET);
                         linha();
-                        printf(AMARELO "\t| titulares.CPF%s                 %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[i].CPF, RESET);
+                        printf(AMARELO "\t| CPF%s                 %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[i].CPF, RESET);
                         linha();
                         printf(AMARELO "\t| TIPO DE CONTA%s       %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[i].contas[i].tipoConta, RESET);
                         linha();
@@ -273,7 +278,7 @@ int main() // FUNÇÃO PRINCIPAL
                         linha();
                         printf("\n");
                     }
-                    rendimentos[i] = 0;
+                    rendimentos[i] = 0; // INICIALIZA REDIMENTOS PARA A PŔOXIMA BUSCA
                     break;
                 }
             }
@@ -292,7 +297,7 @@ int main() // FUNÇÃO PRINCIPAL
 
             for (int i = 0; i < totalTitulares; i++)
             {
-                if (strcmp(titulares[i].contas[i].numConta, pesquisa) == 0)
+                if (strcmp(titulares[i].contas[i].numConta, pesquisa) == 0) // VERIFICA SE A VARIÁVEL PESQUISA É IGUAL A ALGUMA CONTA EXISTENTE
                 {
                     encontrada = 1;
                     printf(VERDE "CONTA ENCONTRADA\n\n" RESET);
@@ -358,7 +363,7 @@ int main() // FUNÇÃO PRINCIPAL
                     }
                 }
             }
-            if (encontrada == 0)
+            if (encontrada == 0) // CASO NÃO ENCONTRE
             {
                 printf(VERMELHO "\nCONTA NÃO ENCONTRADA\n\n");
             }
@@ -388,7 +393,7 @@ int main() // FUNÇÃO PRINCIPAL
                     linha();
                     printf(AMARELO "\t| TELEFONE%s      %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[i].tel, RESET);
                     linha();
-                    printf(AMARELO "\t| titulares.CPF%s           %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[i].CPF, RESET);
+                    printf(AMARELO "\t| CPF%s           %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[i].CPF, RESET);
                     linha();
                     printf("\n");
 
