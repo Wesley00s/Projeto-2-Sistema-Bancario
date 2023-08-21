@@ -1,8 +1,11 @@
+// Dupla: Wesley Rodrigues & Wesnei Paiva ****************************************************************
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h> // BIBLIOTECA PARA ADICIONAR A FUNCIONALIDADE DE PEGAR A DATA E HORA DO SISTEMA
 
-#define TAM 100 // QUANTIDADE DE CONTAS QUE PODEM SER ABERTAS
+#define TAM 100 // QUANTIDADE MÁXIMA DE CONTAS QUE PODEM SER ABERTAS
 
 // DEFININDO CORES PARA DEIXAR A APARÊNCIA MAIS AGRADÁVEL
 #define VERMELHO "\x1B[31m"
@@ -22,6 +25,18 @@ void limparBuffer()
 void linha()
 {
     printf(AZUL "\t|-----------------------------------------------------|\n" RESET);
+}
+
+void menu() // FUNÇÃO PARA EXIBIR O MENU DE OPÇÕES
+{
+    printf(AZUL "\n=========================== MENU DE OPÇÕES ===========================\n\n" RESET);
+    printf(AZUL "--------------------------  ---------------------  --------------------\n" RESET);
+    printf("| 1 | Criar Conta        |  | 4 | Remover Conta |  | 7 | Rendimentos  |\n");
+    printf(AZUL "|---|--------------------|  |---|---------------|  |---|--------------|\n" RESET);
+    printf("| 2 | Consultar Conta    |  | 5 | Ver Lista     |  | 8 | Empréstimo   |\n");
+    printf(AZUL "|---|--------------------|  |---|---------------|  |---|--------------|\n" RESET);
+    printf("| 3 | Realizar Transação |  | 6 | Tranferência  |  | 9 | Sair         |\n");
+    printf(AZUL "--------------------------  ---------------------  --------------------\n" RESET);
 }
 
 // ARMAZENA OS DADOS BANCÁRIOS
@@ -47,21 +62,30 @@ struct Titulares
 
 int main() // FUNÇÃO PRINCIPAL
 {
-    int acao = 0;               // CONTROLA AS OPÇÕES DO MENU
+    int action = 0;             // CONTROLA AS OPÇÕES DO MENU
     int totalTitulares = 0;     // CONTADOR DE TITULARES COM CONTAS ABERTAS
     int opcao = 0;              // CONTROLA A OPÇÃO DE DEPÓSITO E SAQUE
     int opcaoConta = 0;         // CONTROLA A OPÇÃO DA CONTA (CORRENTE OU POUPANÇA)
     int rendimentos[TAM] = {0}; // CONTADOR DE CONTAS QUE PODEM ATRIBUIR RENDIMENTO, NO CASO POUPANÇA
+    int debitEncontrada = 0;    // USADO PARA VALIDAR SE A CONTA DEBITADA EXISTE
+    int creditEncontrada = 0;   // USADO PARA VALIDAR SE A CONTA CREDITADA EXISTE
+    int indexDebit = -1;        // ARMAZENA O ÍNDICE DA CONTA DEBITADA
+    int indexCredit = -1;       // ARMAZENA O ÍNDICE DA CONTA CREDITADA
     float valor = 0;            // ARMAZENA TEMPORÁRIAMENTE O VALOR DE DEPÓSITO E SAQUE
     char pesquisa[15];          // ARMAZENA O NÚMERO DA CONTA QUE DESEJA PESQUISAR
 
     // ONDE OS DADOS DOS TITULARES SÃO ARMAZENADOS
     struct Titulares titulares[TAM];
 
-    // ONDE OS DADOS BANCÁRIOS DOS TITULARES SÃO ARMAZENADOS
-
+    printf(AMARELO "\n******************| SEJA BEM VINDO AO STAR BANK SA |******************\n" RESET);
     do
     {
+        // FUNÇÕES PARA PEGAR HORA E DATA DO SISTEMA
+        time_t rawtime;
+        struct tm timeinfo;
+        time(&rawtime);
+        localtime_r(&rawtime, &timeinfo);
+
         rendimentos[totalTitulares] = 0; // USADA PRA VERIFICAR SE A CONTA ENCONTRDAD É POUPANÇA
         char conferirConta[TAM][6];      // ARMAZENA O NÚMERO DA CONTA ADICIONADA PARA VERIFICAÇÃO SE JÁ NÃO EXISTE
         float valTransf = 0;             // ARMAZENA O VALOR DA TRANSFERÊNCIA
@@ -73,22 +97,15 @@ int main() // FUNÇÃO PRINCIPAL
         int contCredit = 0;              // CONTADOR DO INDICE DA CONTA A SER CRÉDITADA
         int opcaoEmprestimo = 0;         // VERIFICA A OPÇÃO DO EMPRÉSTIMO (PEDIR OU PAGAR)
         int contaExistente = 0;          // VERIFICA SE A CONTA CRIADA JÁ EXISTE
+        int confirmRemove = 0;           // USADA PARA CONFIRMAÇÃO DE REMOVER CONTA
 
         // EXIBE MENU DE OPÇÕES
-        printf(AMARELO "\n=========================== MENU DE OPÇÕES ===========================\n\n" RESET);
-        printf(AZUL "--------------------------  ---------------------  --------------------\n" RESET);
-        printf("| 1 | Criar Conta        |  | 4 | Remover Conta |  | 7 | Rendimentos  |\n");
-        printf(AZUL "|---|--------------------|  |---|---------------|  |---|--------------|\n" RESET);
-        printf("| 2 | Consultar Conta    |  | 5 | Ver Lista     |  | 8 | Empréstimo   |\n");
-        printf(AZUL "|---|--------------------|  |---|---------------|  |---|--------------|\n" RESET);
-        printf("| 3 | Realizar Transação |  | 6 | Tranferência  |  | 9 | Sair         |\n");
-        printf(AZUL "--------------------------  ---------------------  --------------------\n" RESET);
+        menu();
+        scanf("%d", &action); // OPÇÃO
 
-        scanf("%d", &acao); // OPÇÃO
-
-        switch (acao)
+        switch (action)
         {
-        case 1: // OPÇÃO DE CRIAR CONTA
+        case 1: // OPÇÃO DE CRIAR CONTA*
             printf(AMARELO "\n=========================== CRIAR CONTA ===========================\n\n" RESET);
             printf("Qual tipo de conta?\n");
 
@@ -107,7 +124,7 @@ int main() // FUNÇÃO PRINCIPAL
                 scanf("%50[^\n]s", titulares[totalTitulares].nome);
                 limparBuffer();
 
-                printf("Digite o CPF: ");
+                printf("Digite o CPF (xxx.xxx.xxx-xx): ");
                 scanf("%20[^\n]s", titulares[totalTitulares].CPF);
                 limparBuffer();
 
@@ -150,9 +167,9 @@ int main() // FUNÇÃO PRINCIPAL
                     printf(VERDE "\nCONTA CRIADA COM SUCESSO!\n" RESET);
                 }
 
-                totalTitulares++; // ATUALIZA O NÚMERO DE TITULARES
+                totalTitulares++;                                           // ATUALIZA O NÚMERO DE TITULARES
                 titulares[totalTitulares].contas[totalTitulares].saldo = 0; // INICIALIZA O SALDO DA NOVA CONTA COM 0
-                break;
+            break; // FIM DO CASE: OPÇÃO CONTA CORRENTE
 
             case 2: // OPÇÃO DE CONTA POUPANÇA
                 rendimentos[totalTitulares] = 1;
@@ -161,7 +178,7 @@ int main() // FUNÇÃO PRINCIPAL
                 scanf("%30[^\n]s", titulares[totalTitulares].nome);
                 limparBuffer();
 
-                printf("Digite o CPF: ");
+                printf("Digite o CPF (xxx.xxx.xxx-xx): ");
                 scanf("%15[^\n]s", titulares[totalTitulares].CPF);
                 limparBuffer();
 
@@ -186,7 +203,6 @@ int main() // FUNÇÃO PRINCIPAL
                         contaExistente = 1;
                     }
                 }
-
                 // SE A CONTA JÁ EXISTE RETORNA UM ERRO
                 if (contaExistente)
                 {
@@ -204,17 +220,17 @@ int main() // FUNÇÃO PRINCIPAL
                     printf(VERDE "\nCONTA CRIADA COM SUCESSO!\n" RESET);
                 }
 
-                totalTitulares++; // ATUALIZA O NÚMERO DE TITULARES
+                totalTitulares++;                                           // ATUALIZA O NÚMERO DE TITULARES
                 titulares[totalTitulares].contas[totalTitulares].saldo = 0; // INICIALIZA O SALDO DA NOVA CONTA COM 0
-                break;
+            break; // FIM DO CASE: OPÇÃO POUPANÇA
 
             default:
                 printf(VERMELHO "\n[ERROR] Opção inválida!\n\n" RESET);
-                break;
-            }
             break;
+            }      // FIM DO SWITCH: OPÇÃO CONTA
+        break; // FIM DO CASE: CRIAR CONTA*
 
-        case 2: // OPÇÃO DE COSULTAR CONTA
+        case 2: // OPÇÃO DE COSULTAR CONTA*
             printf(AMARELO "\n=========================== CONSULTAR CONTA ===========================\n\n" RESET);
             limparBuffer();
             printf("Digite o número da conta que deseja encontrar: ");
@@ -228,7 +244,7 @@ int main() // FUNÇÃO PRINCIPAL
                     encontrada = 1; // USADO PARA VERIFICAR SE A CONTA FOI ENCONTRADA
                     printf(VERDE "CONTA ENCONTRADA\n\n" RESET);
 
-                    if (rendimentos[i] == 1) // SE RENDIMETOS FOR IGUAL A 1, ENCONTROU UMA CONTA CORRENTE
+                    if (rendimentos[i] == 1) // SE RENDIMETOS FOR IGUAL A 1, ENCONTROU UMA CONTA PUPANÇA
                     {
                         printf(AZUL "\n\t* DADOS\n" RESET);
                         linha();
@@ -286,9 +302,9 @@ int main() // FUNÇÃO PRINCIPAL
             {
                 printf(VERMELHO "CONTA NÃO ENCONTRADA\n\n" RESET);
             }
-            break;
+        break; // FIM DO CASE: CONSULTAR CONTA*
 
-        case 3:
+        case 3: // OPÇÃO REALIZAR TRANSAÇÃO*
             limparBuffer();
             printf(AMARELO "\n=========================== REALIZAR TRANSAÇÃO ===========================\n\n" RESET);
             printf("Número da conta: ");
@@ -297,11 +313,10 @@ int main() // FUNÇÃO PRINCIPAL
 
             for (int i = 0; i < totalTitulares; i++)
             {
-                if (strcmp(titulares[i].contas[i].numConta, pesquisa) == 0) // VERIFICA SE A VARIÁVEL PESQUISA É IGUAL A ALGUMA CONTA EXISTENTE
+                if (strcmp(titulares[i].contas[i].numConta, pesquisa) == 0) // VERIFICA SE A VARIÁVEL "PESQUISA" É IGUAL A ALGUMA CONTA EXISTENTE
                 {
                     encontrada = 1;
                     printf(VERDE "CONTA ENCONTRADA\n\n" RESET);
-
                     linha();
                     printf(AMARELO "\t| TITULAR%s %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[i].nome, RESET);
                     linha();
@@ -316,7 +331,7 @@ int main() // FUNÇÃO PRINCIPAL
 
                     switch (opcao)
                     {
-                    case 1:
+                    case 1: // OPÇÃO DEPOSITAR
                         printf("\nValor a ser depositado: R$ ");
                         scanf("%f", &valor);
 
@@ -330,16 +345,14 @@ int main() // FUNÇÃO PRINCIPAL
                         printf(AMARELO "\t| SALDO ATUALIZADO%s %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, titulares[i].contas[i].saldo, RESET);
                         linha();
                         printf("\n");
-
                         break;
 
-                    case 2:
+                    case 2: // OPÇÃO SACAR
                         printf("\nValor a ser sacado: R$ ");
                         scanf("%f", &valor);
 
-                        if (titulares[i].contas[i].saldo > valor)
+                        if (titulares[i].contas[i].saldo >= valor) // VERIFICA SE O SALDO DO TITULAR É MAIOR OU IGUAL AO VALOR DA TRANSAÇÃO
                         {
-
                             titulares[i].contas[i].saldo -= valor;
 
                             printf(VERDE "\nVALOR DEBITADO COM SECESSO\n\n" RESET);
@@ -352,39 +365,37 @@ int main() // FUNÇÃO PRINCIPAL
                         }
                         else
                         {
-                            printf(VERMELHO "S\nALDO INSUFICIENTE: %.2f\n\n" RESET, titulares[i].contas[i].saldo);
+                            printf(VERMELHO "SALDO INSUFICIENTE: R$ %.2f\n\n" RESET, titulares[i].contas[i].saldo);
                         }
-
                         break;
 
                     default:
                         printf(VERMELHO "\n[ERROR] Opção inválida\n\n" RESET);
                         break;
-                    }
+                    } // FIM DO SWITCH: OPÇÃO
                 }
             }
             if (encontrada == 0) // CASO NÃO ENCONTRE
             {
                 printf(VERMELHO "\nCONTA NÃO ENCONTRADA\n\n");
             }
-            break;
+        break; // FIM DO CASE: REALIZAR TRANSAÇÃO*
 
-        case 4:
-
+        case 4: // OPÇÃO REMOVER CONTA*
             limparBuffer();
             printf(AMARELO "\n=========================== REMOVER CONTA ===========================\n" RESET);
-            printf("Digite o número da conta que deseja remover: ");
+            printf("\nDigite o número da conta que deseja remover: ");
             scanf("%15[^\n]", pesquisa);
             printf("\n\n");
 
             for (int i = 0; i < totalTitulares; i++)
             {
-                if (strcmp(titulares[i].contas[i].numConta, pesquisa) == 0)
+                if (strcmp(titulares[i].contas[i].numConta, pesquisa) == 0) // VERIFICA SE A VARIÁVEL "PESQUISA" É IGUAL A ALGUMA CONTA EXISTENTE
                 {
                     encontrada = 1;
-                    index = i;
+                    index = i; // ARMAZENA O INDICE DO TITULAR
 
-                    printf(VERMELHO "CONTA REMOVIDA" RESET);
+                    printf(VERDE "CONTA ENCONTRADA\n\n" RESET);
                     printf(AZUL "\n\t* DADOS\n" RESET);
                     linha();
                     printf(AMARELO "\t| TITULAR%s       %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[i].nome, RESET);
@@ -397,8 +408,23 @@ int main() // FUNÇÃO PRINCIPAL
                     linha();
                     printf("\n");
 
+                    printf(VERMELHO "\nCONFIRMAR.%s Tem certeza que deseja remover conta?\n(1 - Sim) (2 - Não)\n", RESET);
+                    scanf("%d", &confirmRemove);
+
+                    if (confirmRemove != 1)
+                    {
+
+                        printf(VERDE "\nCONTA NÃO REMOVIDA\n" RESET);
+                        break;
+                    }
+
+                    printf(VERMELHO "\nCONTA REMOVIDA\n" RESET);
+
+                    /* INCREMENTO ATÉ ENCONTAR O INDICE DO TITULAR A SER REMOVIDO, MENOS 1 PARA REORGANIZAR O ARRAY REMOVENDO
+                     A ULTIMA POSIÇÃO ENCONTRDA, QUE NO CASO É A POSIÇÃO ONDE O TITULAR A SER REMOVIDO ESTAR */
                     for (int j = index; j < totalTitulares - 1; j++)
                     {
+                        // REMOVE TTULAR DO ARRAY
                         strcpy(titulares[j].nome, titulares[j + 1].nome);
                         strcpy(titulares[j].CPF, titulares[j + 1].CPF);
                         strcpy(titulares[j].endereco, titulares[j + 1].endereco);
@@ -411,7 +437,7 @@ int main() // FUNÇÃO PRINCIPAL
                     }
                     totalTitulares--;
 
-                    // Limpar os dados do titular removido
+                    // LIMPA OS DADOS DO TITULAR REMOVIDO
                     strcpy(titulares[totalTitulares].nome, "");
                     strcpy(titulares[totalTitulares].CPF, "");
                     strcpy(titulares[totalTitulares].endereco, "");
@@ -427,11 +453,12 @@ int main() // FUNÇÃO PRINCIPAL
             {
                 printf(VERMELHO "CONTA NÃO ENCONTRADA\n\n" RESET);
             }
-            break;
-        case 5:
+        break; // FIM DO CASE: REMOVER CONTA*
+
+        case 5: // OPÇÃO VER LISTA DE TITULARES*
             printf(AMARELO "\n=========================== VER LISTA ===========================\n" RESET);
 
-            if (totalTitulares == 0)
+            if (totalTitulares == 0) // CASO NÃO EXISTA NENHUMA CONTA LISTADA
             {
                 printf(VERMELHO "\nNENHUMA CONTA LISTADA\n\n" RESET);
             }
@@ -439,7 +466,7 @@ int main() // FUNÇÃO PRINCIPAL
             {
                 for (int i = 0; i < totalTitulares; i++)
                 {
-                    if (rendimentos[i] == 1)
+                    if (rendimentos[i] == 1) // CONDIÇÃO PARA EXIBIR AS INFORMAÇÕES DAS CONTAS TIPO POUPANÇA
                     {
                         printf(AZUL "\n\t* DADOS DA %dª CONTA%s\n", i + 1, RESET);
                         linha();
@@ -465,7 +492,7 @@ int main() // FUNÇÃO PRINCIPAL
                         linha();
                         printf("\n");
                     }
-                    else
+                    else // CONTAS TIPO CORRENTE
                     {
                         printf(AZUL "\n\t* DADOS DA %dª CONTA%s\n", i + 1, RESET);
                         linha();
@@ -491,9 +518,9 @@ int main() // FUNÇÃO PRINCIPAL
                     }
                 }
             }
-            break;
+        break; // FIM DO CASE: VER LISTA DE TITULARES*
 
-        case 6:
+        case 6: // OPÇÃO FAZER TRANSFERÊNCIA*
             printf(AMARELO "\n=========================== FAZER TRANSFERÊNCIA ===========================\n\n" RESET);
 
             limparBuffer();
@@ -501,11 +528,18 @@ int main() // FUNÇÃO PRINCIPAL
             scanf("%15[^\n]", pesquisa);
             printf("\n");
 
+            debitEncontrada = 0;
+            creditEncontrada = 0;
+            indexDebit = -1;  // ARMAZENA O ÍNDICE DA CONTA DEBITADA
+            indexCredit = -1; // ARMAZENA O ÍNDICE DA CONTA CREDITADA
+
+            // ENCONTRA O INDICE DA CONTA DEBITADA
             for (contDebit = 0; contDebit < totalTitulares; contDebit++)
             {
                 if (strcmp(titulares[contDebit].contas[contDebit].numConta, pesquisa) == 0)
                 {
-                    encontrada = 1;
+                    debitEncontrada = 1;
+                    indexDebit = contDebit;
                     printf(VERDE "CONTA ENCONTRADA\n\n" RESET);
                     printf(AZUL "\n\t* DADOS\n" RESET);
                     linha();
@@ -515,81 +549,92 @@ int main() // FUNÇÃO PRINCIPAL
                     linha();
                     printf(AMARELO "\t| SALDO%s         %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, titulares[contDebit].contas[contDebit].saldo, RESET);
                     linha();
-
-                    printf("Digite o valor a ser transferido: R$ ");
-                    scanf("%f", &valTransf);
-
-                    limparBuffer();
-                    printf("Digite o número da conta para qual deseja transferir: ");
-                    scanf("%15[^\n]", pesquisa);
-                    printf("\n");
-
-                    for (contCredit = 0; contCredit < totalTitulares; contCredit++)
-                    {
-                        if (strcmp(titulares[contCredit].contas[contCredit].numConta, pesquisa) == 0)
-                        {
-                            encontrada = 1;
-                            printf(VERDE "CONTA ENCONTRADA\n\n" RESET);
-                            printf(AZUL "\n\t* DADOS\n" RESET);
-                            linha();
-                            printf(AMARELO "\t| TITULAR%s       %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[contCredit].nome, RESET);
-                            linha();
-                            printf(AMARELO "\t| CONTA%s         %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[contCredit].contas[contCredit].numConta, RESET);
-                            linha();
-                            printf(AMARELO "\t| SALDO%s         %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, titulares[contCredit].contas[contCredit].saldo, RESET);
-                            linha();
-                            printf("\n");
-
-                            if (valTransf <= titulares[contDebit].contas[contDebit].saldo)
-                            {
-                                titulares[contDebit].contas[contDebit].saldo -= valTransf;
-                                titulares[contCredit].contas[contCredit].saldo += valTransf;
-
-                                printf(VERDE "\nTRANSFERÊNCIA DE R$ %.2f REALIZADA COM SUCESSO!\n\n" RESET, valTransf);
-                                printf(AZUL "\n\t* DADOS CONTA CRÉDITADA\n" RESET);
-                                linha();
-                                printf(AMARELO "\t| TITULAR%s           %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[contCredit].nome, RESET);
-                                linha();
-                                printf(AMARELO "\t| CONTA%s             %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[contCredit].contas[contCredit].numConta, RESET);
-                                linha();
-                                printf(AMARELO "\t| SALDO ATUALIZADO%s  %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, titulares[contCredit].contas[contCredit].saldo, RESET);
-                                linha();
-                                printf("\n");
-
-                                printf(AZUL "\n\t* DADOS CONTA DEBITADA\n" RESET);
-                                linha();
-                                printf(AMARELO "\t| TITULAR%s           %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[contDebit].nome, RESET);
-                                linha();
-                                printf(AMARELO "\t| CONTA%s             %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[contDebit].contas[contDebit].numConta, RESET);
-                                linha();
-                                printf(AMARELO "\t| SALDO ATUALIZADO%s  %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, titulares[contDebit].contas[contDebit].saldo, RESET);
-                                linha();
-                                printf("\n");
-                            }
-                            else
-                            {
-                                printf(VERMELHO "\nSALDO INSUFICIENTE!\n\n" RESET);
-                            }
-                            valTransf = 0;
-
-                            break;
-                        }
-                        if (encontrada == 0)
-                        {
-                            printf(VERMELHO "CONTA NÃO ENCONTRADA\n\n" RESET);
-                        }
-                    }
                     break;
                 }
             }
-            if (encontrada == 0)
+
+            if (!debitEncontrada)
             {
                 printf(VERMELHO "CONTA NÃO ENCONTRADA\n\n" RESET);
+                break;
             }
-            break;
 
-        case 7:
+            limparBuffer();
+            printf("\nDigite o número da conta para a qual deseja transferir: ");
+            scanf("%15[^\n]", pesquisa);
+            printf("\n");
 
+            // PROCURA O INDICE DA CONTA A SER CREDITADA
+            for (contCredit = 0; contCredit < totalTitulares; contCredit++)
+            {
+                if (strcmp(titulares[contCredit].contas[contCredit].numConta, pesquisa) == 0)
+                {
+                    creditEncontrada = 1;
+                    indexCredit = contCredit;
+
+                    printf(VERDE "CONTA ENCONTRADA\n\n" RESET);
+                    printf(AZUL "\n\t* DADOS\n" RESET);
+                    linha();
+                    printf(AMARELO "\t| TITULAR%s %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[contCredit].nome, RESET);
+                    linha();
+                    printf(AMARELO "\t| CONTA%s   %s|%s %s%s%s\n", RESET, AZUL, RESET, VERDE, titulares[contCredit].contas[contCredit].numConta, RESET);
+                    linha();
+                    printf(AMARELO "\t| SALDO%s   %s|%s %sR$ %.2f%s\n", RESET, AZUL, RESET, VERDE, titulares[contCredit].contas[contCredit].saldo, RESET);
+                    linha();
+                    printf("\n");
+                    break;
+                }
+            }
+
+            if (!creditEncontrada)
+            {
+                printf(VERMELHO "CONTA NÃO ENCONTRADA\n\n" RESET);
+                break;
+            }
+
+            printf("Digite o valor a ser transferido: R$ ");
+            scanf("%f", &valTransf);
+
+            if (valTransf <= titulares[indexDebit].contas[indexDebit].saldo) // VERIFICA SE A CONTA CREDITADA TEM SALDO SUFICIENTE PARA OPERAÇÃO
+            {
+                // ATUALIZA OS SALDO DAS CONTAS EM OPERAÇÃO
+                titulares[contDebit].contas[contDebit].saldo -= valTransf;
+                titulares[contCredit].contas[contCredit].saldo += valTransf;
+
+                printf(VERDE "\nTRANSFERÊNCIA DE R$ %.2f REALIZADA COM SUCESSO!\n\n" RESET, valTransf);
+
+                printf(AMARELO "\n\n=======================================================\n\n");
+                printf("SBSA SYSTEM     -   SISTEMA DE INFORMAÇÕES STAR BANK SA\n\n");
+                printf("%02d/%02d/%d          AUTOATENDIMENTO            %02d:%02d:%02d\n\n\n", timeinfo.tm_mday, timeinfo.tm_mon + 1, timeinfo.tm_year + 1900, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+                printf("------------- COMPROVANTE DE TRANSFERÊCIA -------------\n\n");
+                printf("\nCLIENTE:  %s\t\n", titulares[contDebit].nome);
+                printf("\nAGÊNCIA:  %s    -    CONTA:  %s\t\n", titulares[contDebit].contas[contDebit].agencia, titulares[contDebit].contas[contDebit].numConta);
+                printf("\n=======================================================\n\n");
+                printf("SOBRE A TRANSAÇÃO\n");
+                printf("\n-------------------------------------------------------\n\n");
+                printf("CPF DO PAGADOR:                          %s\n\n", titulares[contDebit].CPF);
+                printf("VALOR:                                      R$ %.2f\n\n", valTransf);
+                printf("DATA:                           %02d/%02d/%d  -  %02d:%02d:%02d\n", timeinfo.tm_mday, timeinfo.tm_mon + 1, timeinfo.tm_year + 1900, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+                printf("\n-------------------------------------------------------\n\n");
+                printf("PAGO PARA:               %s\n\n", titulares[contCredit].nome);
+                printf("CPF:                     %s\n\n", titulares[contCredit].CPF);
+                printf("INSTITUIÇÃO:             STAR BANK SA\n\n");
+                printf("TIPO DE CONTA:           %s\n\n", titulares[contCredit].contas[contCredit].tipoConta);
+                printf("AGÊNCIA:   %s   -   CONTA:   %s\n", titulares[contCredit].contas[contCredit].agencia, titulares[contCredit].contas[contCredit].numConta);
+                printf("\n-------------------------------------------------------\n\n");
+                printf("Notificação enviada em:         %02d/%02d/%d  -  %02d:%02d:%02d\n", timeinfo.tm_mday, timeinfo.tm_mon + 1, timeinfo.tm_year + 1900, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+                printf("\n=======================================================\n\n");
+                printf("OBRIGADO POR ESCOLHER STAR BANK!\n");
+                printf("\n=======================================================\n\n\n\n" RESET);
+            }
+            else
+            {
+                printf(VERMELHO "\nSALDO INSUFICIENTE!\n\n" RESET);
+            }
+            valTransf = 0;
+        break;
+
+        case 7: // OPÇÃO RENDIMENTOS*
             printf(AMARELO "\n=========================== RENDIMENTOS ===========================\n\n" RESET);
 
             limparBuffer();
@@ -599,7 +644,7 @@ int main() // FUNÇÃO PRINCIPAL
 
             for (int i = 0; i < totalTitulares; i++)
             {
-                if (strcmp(titulares[i].contas[i].numConta, pesquisa) == 0 && rendimentos[i] == 1)
+                if (strcmp(titulares[i].contas[i].numConta, pesquisa) == 0 && rendimentos[i] == 1) // VERFICA SE "PESQUISA" É IGUAL A ALGUMA CONTA EXISTENTE E SE A OPÇÃO RENDIMENTOS É VERDADEIRA
                 {
                     encontrada = 1;
                     printf(VERDE "CONTA ENCONTRADA\n\n" RESET);
@@ -618,9 +663,9 @@ int main() // FUNÇÃO PRINCIPAL
                     printf("Digite o percentual de rendimentos que seja aplicar: ");
                     scanf("%f", &aplyRendimentos);
 
-                    if (aplyRendimentos <= 10)
+                    if (aplyRendimentos <= 10) // CONDIÇÃO PARA RENDIMENTO NÃO ULTRAPASSAR 10%
                     {
-                        titulares[i].contas[i].percRendimento = aplyRendimentos;
+                        titulares[i].contas[i].percRendimento = aplyRendimentos; // ATUALIZA O RENDIMENTO DA CONTA
 
                         printf(VERDE "\nRENDIMENTO DE %.2f%% ATUALIZADO COM SUCESSO!\n\n" RESET, aplyRendimentos);
                         linha();
@@ -638,7 +683,7 @@ int main() // FUNÇÃO PRINCIPAL
                     {
                         printf(VERMELHO "\nNEGADO! TAXA LIMITE DE 10%% ATINGIDA\n" RESET);
                     }
-                    aplyRendimentos = 0;
+                    aplyRendimentos = 0; // REINICIALIZA O RENDIMENTO APLICADO PARA OUTRA CONTA
 
                     break;
                 }
@@ -647,11 +692,9 @@ int main() // FUNÇÃO PRINCIPAL
             {
                 printf(VERMELHO "CONTA NÃO ENCONTRADA, OU NÃO FAZ PARTE DA MODALIDADE:%s %sPOUPANÇA%s\n\n", RESET, AZUL, RESET);
             }
+            break; // FIM DO CASE: RENDIMENTOS*
 
-            break;
-
-        case 8:
-
+        case 8: // OPÇÃO EMPRÉSTIMO*
             printf(AMARELO "\n=========================== EMPRÉSTIMOS ===========================\n\n" RESET);
 
             limparBuffer();
@@ -661,12 +704,12 @@ int main() // FUNÇÃO PRINCIPAL
 
             for (int i = 0; i < totalTitulares; i++)
             {
-                if (strcmp(titulares[i].contas[i].numConta, pesquisa) == 0)
+                if (strcmp(titulares[i].contas[i].numConta, pesquisa) == 0) // PESQUISA CONTA
                 {
                     encontrada = 1;
                     printf(VERDE "CONTA ENCONTRADA\n\n" RESET);
 
-                    if (rendimentos[i] == 1)
+                    if (rendimentos[i] == 1) // CASO CONTA POUPANÇA
                     {
                         printf(AZUL "\n\t* DADOS\n" RESET);
                         linha();
@@ -684,7 +727,7 @@ int main() // FUNÇÃO PRINCIPAL
                         linha();
                         printf("\n");
                     }
-                    else
+                    else // CONTA CORRENTE
                     {
                         printf(AZUL "\n\t* DADOS\n" RESET);
                         linha();
@@ -706,10 +749,11 @@ int main() // FUNÇÃO PRINCIPAL
                     printf(AZUL "-------------  -------------\n" RESET);
                     scanf("%d", &opcaoEmprestimo);
 
-                    switch (opcaoEmprestimo)
+                    switch (opcaoEmprestimo) // OPÇÃO DE EMPRÉSTIMO: PEDIR OU PAGAR CASO ESTEJA COM PENDÊNCIA
                     {
-                    case 1:
+                    case 1: // OPÇÃO PEDIR EMPRESTIMO
 
+                        // VERIFICA SE O SALDO MINIMO DO TITULAR É SUFICIENTE E SE NÃO POSSUI PEDÊNCIAS COM O BANCO
                         if (titulares[i].contas[i].saldo >= 1000 && titulares[i].contas[i].situacaoEmprestimo == 0)
                         {
                             printf(AZUL "\nPEDIR EMPRÉSTIMO\n\n" RESET);
@@ -718,10 +762,11 @@ int main() // FUNÇÃO PRINCIPAL
                             scanf("%f", &qntEmprestimo);
                             printf("\n");
 
-                            if (qntEmprestimo >= 5000)
+                            if (qntEmprestimo >= 5000) // CONDIÇÃO PARA EMPRÉSTIMO MINÍMO
                             {
+                                // ATUALIZA SALDO E SITUAÇÃO EMPRÉSTIMO
                                 titulares[i].contas[i].saldo += qntEmprestimo;
-                                titulares[i].contas[i].situacaoEmprestimo += qntEmprestimo + (qntEmprestimo * 0.15);
+                                titulares[i].contas[i].situacaoEmprestimo += qntEmprestimo + (qntEmprestimo * 0.15); // APLICA JUROS
 
                                 printf(VERDE "\nEMPRÉSTIMO DE R$ %.2f BEM SUCEDIDO%s\n\n", qntEmprestimo, RESET);
                                 linha();
@@ -750,11 +795,9 @@ int main() // FUNÇÃO PRINCIPAL
                             printf(VERMELHO "\nPEDIDO DE EMPRÉSTIMO NEGADO! VERIFIQUE SE NÃO TEM NENHUMA PENDÊNCIA COM O BANCO OU SE SEU SALDO È SUFICIENTE (MINÍMO R$ 1000)\n" RESET);
                             break;
                         }
+                     break; // FIM DO CASE: PEDIR EMPRÉSTIMO
 
-                        break; // fim do case 1
-
-                    case 2:
-
+                    case 2: // PAGAR EMPRÉSTIMO
                         if (titulares[i].contas[i].situacaoEmprestimo > 0)
                         {
                             printf(AZUL "\nPAGAR EMPRÉSTIMO\n\n" RESET);
@@ -763,8 +806,9 @@ int main() // FUNÇÃO PRINCIPAL
                             printf("Pagar: R$ ");
                             scanf("%f", &qntEmprestimo);
 
-                            if (qntEmprestimo == titulares[i].contas[i].situacaoEmprestimo)
+                            if (qntEmprestimo == titulares[i].contas[i].situacaoEmprestimo) // VERIFICA SE A QUANTIDADE A SER PAGA É IGUAL A SITUAÇÃO EMPRÉSTIMO DO TITULAR
                             {
+                                // ATUALIZA SALDO E SITUAÇÃO EMPRÉSTIMO
                                 titulares[i].contas[i].situacaoEmprestimo -= qntEmprestimo;
                                 titulares[i].contas[i].saldo -= qntEmprestimo;
 
@@ -796,8 +840,12 @@ int main() // FUNÇÃO PRINCIPAL
                             printf(AZUL "\nVOCÊ NÃO TEM PEDÊNCIAS COM O BANCO\n" RESET);
                         }
 
-                        break; // fim do case 2
-                    }          // fim do switch
+                        break; // FIM DO CASE: PAGAR EMPRÉSTIMO
+
+                    default:
+                        printf(VERMELHO "\n[ERROR] OPÇÃO INVÁLIDA!\n" RESET);
+                        break;
+                    } // FIM DO SWITCH: OPÇÃO EMPÉSTIMO
                     break;
                 }
             }
@@ -805,19 +853,18 @@ int main() // FUNÇÃO PRINCIPAL
             {
                 printf(VERMELHO "CONTA NÃO ENCONTRADA\n\n" RESET);
             }
-
-            break;
+        break; // FIM DO CASE: EMPÉSTIMO*
 
         case 9:
             printf(VERMELHO "\nEncerrando...\n\n" RESET);
-            break;
+        break;
 
         default:
             printf(VERMELHO "\n[ERROR] OPÇÃO INVÁLIDA!\n\n" RESET);
-            break;
-        }
+        break;
+        } // FIM DO SWITCH: ACTION
 
-    } while (totalTitulares <= TAM && acao != 9);
+    } while (totalTitulares <= TAM && action != 9);
 
     return 0;
 }
